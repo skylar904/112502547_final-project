@@ -1,0 +1,35 @@
+新增:
+gem5/src/mem/cache/replacement_policies/fb_rp.cc
+gem5/src/mem/cache/replacement_policies/fb_rp.hh
+
+
+ReplacementPolicies更改:
+
+class FBRP(BaseReplacementPolicy):
+    type = 'FBRP'
+    cxx_class = 'FBRP'
+    cxx_header = "mem/cache/replacement_policies/fb_rp.hh"
+
+
+SConscript更改: Source('fb_rp.cc')
+
+
+cache.py l3部分更改成:
+
+class L3Cache(Cache):
+    assoc = 8
+    tag_latency = 20
+    data_latency = 20
+    response_latency = 20
+    mshrs = 20
+    tgts_per_mshr = 12
+    write_buffers = 8
+    #replacement_policy = Param.BaseReplacementPolicy(FBRP(), "Replacement policy")
+
+
+
+需要用到的指令:
+
+./build/X86/gem5.opt configs/example/se.py -c benchmark/quicksort --cpu-type=TimingSimpleCPU --caches --l1i_size=32kB --l1d_size=32kB --l2cache --l2_size=128kB --l3cache --l3_size=1MB --l3_assoc=2 --mem-type=NVMainMemory --nvmain-config=../NVmain/Config/PCM_ISSCC_2012_4GB.config > cmdlog_FB.txt
+
+./build/X86/gem5.opt configs/example/se.py -c benchmark/quicksort --cpu-type=TimingSimpleCPU --caches --l1i_size=32kB --l1d_size=32kB --l2cache --l2_size=128kB --l3cache --l3_size=1MB --l3_assoc=2 --mem-type=NVMainMemory --nvmain-config=../NVmain/Config/PCM_ISSCC_2012_4GB.config > cmdlog_LRU.txt
