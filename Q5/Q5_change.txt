@@ -1,0 +1,18 @@
+將base.cc須加上:
+
+        if (blk->isWritable()) {
+            PacketPtr writeclean_pkt = writecleanBlk(blk, pkt->req->getDest(), pkt->id);
+            writebacks.push_back(writeclean_pkt);
+        }
+
+
+使用的指令:
+
+scons build/X86/gem5.opt -j 9
+
+gcc --static multiply.c -o multiply 
+
+./build/X86/gem5.opt configs/example/se.py -c benchmark/multiply --cpu-type=TimingSimpleCPU --caches --l1i_size=32kB --l1d_size=32kB --l2cache --l2_size=128kB --l3cache --l3_size=1MB --l3_assoc=4 --mem-type=NVMainMemory --nvmain-config=../NVmain/Config/PCM_ISSCC_2012_4GB.config > cmdlog_writeback.txt
+
+
+./build/X86/gem5.opt configs/example/se.py -c benchmark/multiply --cpu-type=TimingSimpleCPU --caches --l1i_size=32kB --l1d_size=32kB --l2cache --l2_size=128kB --l3cache --l3_size=1MB --l3_assoc=4 --mem-type=NVMainMemory --nvmain-config=../NVmain/Config/PCM_ISSCC_2012_4GB.config > cmdlog_writethrough.txt
