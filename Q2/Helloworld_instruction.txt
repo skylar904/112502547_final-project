@@ -1,0 +1,41 @@
+安裝編譯工具:
+sudo apt install build-essential git m4 scons zlib1g zlib1g-dev libprotobuf-dev protobuf-compiler 
+libprotoc-dev libgoogle-perftools-dev python3-dev python3-six python libboost-all-dev pkg-
+config
+
+安裝GEM5:
+ https://gem5.googlesource.com/public/gem5/+/525ce650e1a5bbe71c39d4b15598d6c003cc9f9e
+ 點tgz下載(不推薦下載最新版的GEM5，後面編譯會出問題)
+
+把解壓後的GEM5資料夾丟進HOME
+
+編譯GEM5:
+ 在GEM5目錄下scons build/X86/gem5.opt (後面可以加–j num   num為multithread數量來加速)
+
+用GIT 安裝NVMAIN:
+git clone https://github.com/SEAL-UCSB/NVmain
+把nvmain跟gem5放到同一個目錄下
+
+修改SCONSCRIPT:
+進入nvmain資料夾點開SConscript 把36行的from gem5_scons import Transform註解掉(記得要存檔)
+
+編譯NVMAIN:
+在NVmain目錄下scons --build-type=fast
+
+
+修改GEM5 OPTIONS:
+ 在gem5/configs/common/Options.py中第133行加入下段程式(記得要存檔)
+ for arg in sys.argv:
+ if arg[:9] == "--nvmain-":
+ parser.add_option(arg, type="string", default="NULL", help="Set NVMain configuration 
+value for a parameter")
+
+還原SCONSCRIPT:
+還原前面nvmain sconscript註解掉的指令
+
+混和編譯GEM5:
+在GEM5目錄下混合NVMAIN編譯GEM5
+scons EXTRAS=../NVmain build/X86/gem5.opt
+
+測試Hello world:
+./build/X86/gem5.opt configs/example/se.py -c tests/test-progs/hello/bin/x86/linux/hello --cpu-type=TimingSimpleCPU --caches --l2cache --mem-type=NVMainMemory --nvmain-config=../NVmain/Config/PCM_ISSCC_2012_4GB.config
